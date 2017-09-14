@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -86,7 +86,29 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
+    #get the directions class
+    from game import Directions
+    from util import Stack
+    #set up the four Directions
+    north = Directions.NORTH
+    east = Directions.EAST
+    south = Directions.SOUTH
+    west = Directions.WEST
+    #get the start state
+    startState = problem.getStartState()
+    #initialize the list that we will want to return
+    listOfDirections = []
+    #initialize the frontier
+    frontier = Stack()
+    frontier.push(startState)
+    #initialize the explored set
+        #will do this later on
+    #make sure that we did not start at the goal
+
+    if problem.isGoalState(startState):
+        return listOfDirections
+    else:
+        return listOfDirections
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
