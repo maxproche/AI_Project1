@@ -1,0 +1,5 @@
+Dictionaries, Hashing, Keys:
+https://stackoverflow.com/questions/1024847/add-new-keys-to-a-dictionary
+https://stackoverflow.com/questions/19641579/python-convert-tuple-to-string
+https://stackoverflow.com/questions/9525399/python-converting-from-tuple-to-string
+https://stackoverflow.com/questions/473099/check-if-a-given-key-already-exists-in-a-dictionary-and-increment-it

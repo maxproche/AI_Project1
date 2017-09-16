@@ -83,14 +83,22 @@ class Node:
         self.action = action
 
 def getActionsForNode(node):
+        #get the parent node of the winning node
         parentNode = node.parentNode
+        #add the winning node's action to our list of actions
         listOfActions = [node.action]
+        #as long as the parent node has an action (aka as long as it is not the Root Node) then:
         while parentNode.action != None:
+            #get the action
             action = parentNode.action
+            #add it to the list
             listOfActions.append(action)
+            #get the next parent node
             parentNode = parentNode.parentNode
+        #reverse the list of actions because the first action in the list is the winning node's action
+        #and the last action in the list is the first action
         listOfActions.reverse()
-        print listOfActions
+        #return the list of actions
         return listOfActions
 
 def depthFirstSearch(problem):
@@ -115,11 +123,6 @@ def depthFirstSearch(problem):
     #set up while loop variables
     success = False
     failure = False
-    #set up the four Directions
-    north = Directions.NORTH
-    east = Directions.EAST
-    south = Directions.SOUTH
-    west = Directions.WEST
     #get the start state
     startState = problem.getStartState()
     #initialize the list that we will want to return
@@ -130,37 +133,55 @@ def depthFirstSearch(problem):
     frontier = Stack()
     #put initial state in the frontier
     frontier.push(startNode)
-    #initialize the explored set
-    explored = []
+    #initialize the explored dictionary
+    explored = {}
     #make sure that we did not start at the goal
     if problem.isGoalState(startState):
         return listOfDirections
+    #as long as we have not had success or failure then
     while success == False and failure == False:
+        #if there is nothing in the frontier then stop the loop and return None
         if frontier.isEmpty():
             print "Error: Empty Frontier"
             failure = True
             return None
+        #get the deepest node in the frontier
         node = frontier.pop()
-        explored.append(node.state)
+        #convert the state from state -> string so we can make it a dicitonary key
+        nodeStateString = str(node.state)
+        #add the node's state to the dictionary as a key
+        explored[nodeStateString] = True
+        #get the successors of this popped node's state
         successors = problem.getSuccessors(node.state)
+        #loop through the successors of this node
         for successor in successors:
+            #declare state, action, and cost of this successor
             state, action, cost = successor
-            if action == None:
-                print "None"
-                break
+            #create a childNode of the popped node above
             childNode = Node(state, node, action, cost)
+            #turn the state into a string to test if it is an exisiting key
+            stateString = str(state)
+            #assume that the state is not contained in the dictionary
             contains = False
-            for exploredState in explored:
-                if exploredState == state:
-                    contains = True
+            #if the state string is a key of the dictionary then
+            if stateString in explored:
+                #change contains to true because it is contained in the dictionary
+                contains = True
+            #if we have not yet explored this state then
             if contains == False:
+                #if it is a goal
                 if problem.isGoalState(state):
+                    #let us know
                     print "*"*60
                     print "goal state"
                     print "*"*60
+                    #change success to true to stop the loop
                     success = True
+                    #get the list of directions starting with the winning node (childNode)
                     listOfDirections = getActionsForNode(childNode)
+                    #return that list of directions
                     return listOfDirections
+                #if it is not a winner then add it to the frontier
                 frontier.push(childNode)
 """
     def depthFirstSearch(problem):
