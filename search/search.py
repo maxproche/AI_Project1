@@ -85,7 +85,7 @@ class Node:
 def getActionsForNode(node):
         parentNode = node.parentNode
         listOfActions = [node.action]
-        while parentNode.parentNode != None:
+        while parentNode.action != None:
             action = parentNode.action
             listOfActions.append(action)
             parentNode = parentNode.parentNode
