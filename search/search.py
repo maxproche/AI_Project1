@@ -72,6 +72,27 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+class Node:
+    """
+    Attributes: state - the state of that node
+                parentNode - the node from which we got here
+    """
+    def __init__(self, state, parentNode, action, cost):
+        self.state = state
+        self.parentNode = parentNode
+        self.action = action
+
+def getActionsForNode(node):
+        parentNode = node.parentNode
+        listOfActions = []
+        while parentNode.parentNode != None:
+            action = parentNode.action
+            listOfActions.append(action)
+            parentNode = parentNode.parentNode
+        listOfActions.reverse()
+        print listOfActions
+        return listOfActions
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -86,9 +107,14 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    #get the directions class
+    #get the needed class
     from game import Directions
+    from game import Actions
+    from pacman import GameState
     from util import Stack
+    #set up while loop variables
+    success = False
+    failure = False
     #set up the four Directions
     north = Directions.NORTH
     east = Directions.EAST
@@ -98,18 +124,77 @@ def depthFirstSearch(problem):
     startState = problem.getStartState()
     #initialize the list that we will want to return
     listOfDirections = []
+    #create the initial node
+    startNode = Node(startState, None, None, 0)
     #initialize the frontier
     frontier = Stack()
-    frontier.push(startState)
+    #put initial state in the frontier
+    frontier.push(startNode)
     #initialize the explored set
-        #will do this later on
+    explored = []
     #make sure that we did not start at the goal
-
     if problem.isGoalState(startState):
         return listOfDirections
-    else:
-        return listOfDirections
-    util.raiseNotDefined()
+    while success == False and failure == False:
+        if frontier.isEmpty():
+            print "Error: Empty Frontier"
+            failure = True
+            return None
+        node = frontier.pop()
+        explored.append(node.state)
+        successors = problem.getSuccessors(node.state)
+        for successor in successors:
+            state, action, cost = successor
+            if action == None:
+                print "None"
+                break
+            childNode = Node(state, node, action, cost)
+            contains = False
+            for exploredState in explored:
+                if exploredState == state:
+                    contains = True
+            if contains == False:
+                if problem.isGoalState(state):
+                    print "*"*60
+                    print "goal state"
+                    print "*"*60
+                    success = True
+                    listOfDirections = getActionsForNode(childNode)
+                    return listOfDirections
+                frontier.push(childNode)
+"""
+    def depthFirstSearch(problem):
+    Search the deepest nodes in the search tree first.
+
+    Your search algorithm needs to return a list of actions that reaches the
+    goal. Make sure to implement a graph search algorithm.
+
+    To get started, you might want to try some of these simple commands to
+    understand the search problem that is being passed in:
+
+    print "Start:", problem.getStartState()
+    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+    "*** YOUR CODE HERE ***"
+
+
+    print type(problem.getStartState())
+    print problem.getStartState()
+
+    sucs = problem.getSuccessors(problem.getStartState())
+
+    actions = []
+    for suc in sucs:
+        state = suc[0]
+        action = suc[1]
+        stepCost = suc[2]
+
+        state, action, stepCost = suc
+        newsucs = problem.getSuccessors(state)
+        actions.append(action)
+
+    return actions
+"""
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
