@@ -198,29 +198,47 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     "*** YOUR CODE HERE ***"
 
-
-    print type(problem.getStartState())
-    print problem.getStartState()
-
-    sucs = problem.getSuccessors(problem.getStartState())
-
-    actions = []
-    for suc in sucs:
-        state = suc[0]
-        action = suc[1]
-        stepCost = suc[2]
-
-        state, action, stepCost = suc
-        newsucs = problem.getSuccessors(state)
-        actions.append(action)
-
-    return actions
 """
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Queue
+    success = False
+    failure = False
+    startState = problem.getStartState()
+    startNode = Node(startState,None,None,0)
+    listOfDirections = []
+    if problem.isGoalState(startState):
+        print "Start Node was winning node"
+        return listOfDirections
+    frontier = Queue()
+    frontier.push(startNode)
+    explored = {}
+    while (success == False) and (failure == False):
+        if frontier.isEmpty():
+            print "Error: Frontier is empty"
+            return None
+        node = frontier.pop()
+        nodeStringState = str(node.state)
+        explored[nodeStringState] = True
+        successors = problem.getSuccessors(node.state)
+        for successor in successors:
+            state, action, cost = successor
+            childNode = Node(state, node, action, cost)
+            stringState = str(state)
+            contains = False
+            if stringState in explored:
+                contains = True
+            if contains == False:
+                if problem.isGoalState(state):
+                    print "*"*60
+                    print "goal state"
+                    print "*"*60
+                    listOfDirections = getActionsForNode(childNode)
+                    return listOfDirections
+                frontier.push(childNode)
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
