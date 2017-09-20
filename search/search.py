@@ -247,36 +247,36 @@ def uniformCostSearch(problem):
     success = False
     failure = False
     startState = problem.getStartState()
-    startNode = Node(startState,None,None,0)
-    listOfDirections = []
-    if problem.isGoalState(startState):
-        print "Start Node was winning node"
-        return listOfDirections
+    startNode = Node(startState, None, None, 0)
     frontier = PriorityQueue()
     frontier.push(startNode, 0)
     explored = {}
+    listOfDirections = []
+
     while (success == False) and (failure == False):
         if frontier.isEmpty():
             print "Error: Frontier is empty"
+            failure = True
             return None
         node = frontier.pop()
-        nodeStringState = str(node.state)
-        explored[nodeStringState] = True
+        if problem.isGoalState(node.state):
+            print "*"*60
+            print "goal state"
+            print "*"*60
+            success = True
+            listOfDirections = getActionsForNode(node)
+            return listOfDirections
+        nodeStateString = str(node.state)
+        explored[nodeStateString] = True
         successors = problem.getSuccessors(node.state)
         for successor in successors:
             state, action, cost = successor
             childNode = Node(state, node, action, cost)
-            stringState = str(state)
-            contains = False
-            if stringState in explored:
-                contains = True
-            if contains == False:
-                if problem.isGoalState(state):
-                    print "*"*60
-                    print "goal state"
-                    print "*"*60
-                    listOfDirections = getActionsForNode(childNode)
-                    return listOfDirections
+            stateString = str(state)
+            containsState = False
+            if stateString in explored:
+                containsState = True
+            if containsState == False:
                 frontier.push(childNode, cost)
 
 def nullHeuristic(state, problem=None):
