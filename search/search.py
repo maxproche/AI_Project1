@@ -81,6 +81,7 @@ class Node:
         self.state = state
         self.parentNode = parentNode
         self.action = action
+        self.cost = cost
 
 def getActionsForNode(node):
         #get the parent node of the winning node
@@ -286,10 +287,63 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
-def aStarSearch(problem, heuristic=nullHeuristic):
+def getGoalState(problem):
+    for row in range(0,100):
+        for col in range(0,100):
+            state = (row,col)
+            if problem.isGoalState(state):
+                print "*"*60
+                print "found goal state ", state
+                print "*"*60
+                return state
+    print "loop ended"
+
+def heuristicFunction(state, problem, goalState):
+    from util import manhattanDistance
+    distance = manhattanDistance(state, goalState)
+    return distance
+
+def aStarSearch(problem, heuristic=heuristicFunction):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+    goalState = getGoalState(problem)
+
+    success = False
+    failure = False
+    startState = problem.getStartState()
+    frontier = PriorityQueue()
+    explored = {}
+    heuristicCost = heuristicFunction(startState, problem, goalState)
+    initialPathCost = 0 + heuristicCost
+    initialNode = Node(startState, None, None, heuristicCost)
+    frontier.push(initialNode,initialPathCost)
+
+    listOfDirections = []
+    while success == False and failure == False:
+        if frontier.isEmpty():
+            print "Error: Empty Frontier"
+            failure = True
+            return None
+        node = frontier.pop()
+        if problem.isGoalState(node.state):
+            listOfDirections = getActionsForNode(node)
+            success = True
+            return listOfDirections
+        stateString = str(node.state)
+        explored[stateString] = True
+        successors = problem.getSuccessors(node.state)
+        for successor in successors:
+            state, action, cost = successor
+            childHeuristicCost = heuristicFunction(state, problem, goalState)
+            childPathCost = cost + childHeuristicCost
+            child = Node(state, node, action, cost)
+            childStateString = str(state)
+            contains = False
+            if childStateString in explored:
+                contains = True
+            if contains == False:
+                frontier.push(child, childPathCost)
+
 
 
 # Abbreviations
