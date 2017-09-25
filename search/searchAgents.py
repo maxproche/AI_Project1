@@ -289,20 +289,72 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
 
+    def positionIsCorner(self, position):
+        notCornerFlag = -1
+        cornerCount = 0
+        for corner in self.corners:
+            if position == corner:
+                return cornerCount
+            cornerCount = cornerCount + 1
+        return notCornerFlag
+
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        startingPosition = self.startingPosition
+        cornerOne, cornerTwo, cornerThree, cornerFour = False, False, False, False
+        if self.positionIsCorner(startingPosition) == 0:
+            cornerOne = True
+        elif self.positionIsCorner(startingPosition) == 1:
+            cornerTwo = True
+        elif self.positionIsCorner(startingPosition) == 2:
+            cornerThree = True
+        elif self.positionIsCorner(startingPosition) == 3:
+            cornerFour = True
+
+        startState = (startingPosition, cornerOne, cornerTwo, cornerThree, cornerFour)
+
+        return startState
+
+    def visitedAllCorners(self, state):
+        for i in range(1,5):
+            if state[i] == False:
+                return False
+        return True
+
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.visitedAllCorners(state)
+
+    def nextStateForAction(self, state, action):
+        position = state[0]
+
+        x, y = position
+        dx, dy = Actions.directionToVector(action)
+        nextx, nexty = int(x + dx), int(y + dy)
+        newPosition = (nextx, nexty)
+
+        cornerOne = state[1]
+        cornerTwo = state[2]
+        cornerThree = state[3]
+        cornerFour = state[4]
+
+        if self.positionIsCorner(newPosition) == 0:
+            cornerOne = True
+        elif self.positionIsCorner(newPosition) == 1:
+            cornerTwo = True
+        elif self.positionIsCorner(newPosition) == 2:
+            cornerThree = True
+        elif self.positionIsCorner(newPosition) == 3:
+            cornerFour = True
+
+        nextState = (newPosition, cornerOne, cornerTwo, cornerThree, cornerFour)
+        return nextState
 
     def getSuccessors(self, state):
         """
@@ -324,7 +376,16 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
+            position = state[0]
+            x, y = position
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if hitsWall == False:
+                nextState = self.nextStateForAction(state, action)
+                cost = 1
+                successor = (nextState, action, cost)
+                successors.append(successor)
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
