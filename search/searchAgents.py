@@ -426,9 +426,9 @@ def cornersHeuristic(state, problem):
 
     totalDistance = 0
     print corners
-    for i in range(0,4):
+    for i in range(1,5):
         if state[i] == False:
-            corner = problem.corners[i]
+            corner = problem.corners[i - 1]
             cornerX, cornerY = corner
             dx = x - cornerX
             dy = y - cornerY
