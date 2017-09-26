@@ -148,6 +148,10 @@ def depthFirstSearch(problem):
             return None
         #get the deepest node in the frontier
         node = frontier.pop()
+        if problem.isGoalState(node.state):
+            success = True
+            listOfDirections = getActionsForNode(childNode)
+            return listOfDirections
         #convert the state from state -> string so we can make it a dicitonary key
         nodeStateString = str(node.state)
         #add the node's state to the dictionary as a key
@@ -170,18 +174,6 @@ def depthFirstSearch(problem):
                 contains = True
             #if we have not yet explored this state then
             if contains == False:
-                #if it is a goal
-                if problem.isGoalState(state):
-                    #let us know
-                    print "*"*60
-                    print "goal state"
-                    print "*"*60
-                    #change success to true to stop the loop
-                    success = True
-                    #get the list of directions starting with the winning node (childNode)
-                    listOfDirections = getActionsForNode(childNode)
-                    #return that list of directions
-                    return listOfDirections
                 #if it is not a winner then add it to the frontier
                 frontier.push(childNode)
 """
@@ -211,7 +203,6 @@ def breadthFirstSearch(problem):
     startNode = Node(startState,None,None,0)
     listOfDirections = []
     if problem.isGoalState(startState):
-        print "Start Node was winning node"
         return listOfDirections
     frontier = Queue()
     frontier.push(startNode)
@@ -221,6 +212,9 @@ def breadthFirstSearch(problem):
             print "Error: Frontier is empty"
             return None
         node = frontier.pop()
+        if problem.isGoalState(node.state):
+            listOfDirections = getActionsForNode(childNode)
+            return listOfDirections
         nodeStringState = str(node.state)
         explored[nodeStringState] = True
         successors = problem.getSuccessors(node.state)
@@ -232,12 +226,6 @@ def breadthFirstSearch(problem):
             if stringState in explored:
                 contains = True
             if contains == False:
-                if problem.isGoalState(state):
-                    print "*"*60
-                    print "goal state"
-                    print "*"*60
-                    listOfDirections = getActionsForNode(childNode)
-                    return listOfDirections
                 frontier.push(childNode)
 
 
@@ -261,9 +249,6 @@ def uniformCostSearch(problem):
             return None
         node = frontier.pop()
         if problem.isGoalState(node.state):
-            print "*"*60
-            print "goal state"
-            print "*"*60
             success = True
             listOfDirections = getActionsForNode(node)
             return listOfDirections
