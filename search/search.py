@@ -135,7 +135,7 @@ def depthFirstSearch(problem):
     #put initial state in the frontier
     frontier.push(startNode)
     #initialize the explored dictionary
-    explored = {}
+    explored = {}  #*******************************************
     #make sure that we did not start at the goal
     if problem.isGoalState(startState):
         return listOfDirections
@@ -150,31 +150,21 @@ def depthFirstSearch(problem):
         node = frontier.pop()
         if problem.isGoalState(node.state):
             success = True
-            listOfDirections = getActionsForNode(childNode)
+            listOfDirections = getActionsForNode(node)
             return listOfDirections
         #convert the state from state -> string so we can make it a dicitonary key
-        nodeStateString = str(node.state)
-        #add the node's state to the dictionary as a key
-        explored[nodeStateString] = True
+        nodeStateString = str(node.state) #******** change this ***********************
         #get the successors of this popped node's state
-        successors = problem.getSuccessors(node.state)
-        #loop through the successors of this node
-        for successor in successors:
-            #declare state, action, and cost of this successor
-            state, action, cost = successor
-            #create a childNode of the popped node above
-            childNode = Node(state, node, action, cost)
-            #turn the state into a string to test if it is an exisiting key
-            stateString = str(state)
-            #assume that the state is not contained in the dictionary
-            contains = False
-            #if the state string is a key of the dictionary then
-            if stateString in explored:
-                #change contains to true because it is contained in the dictionary
-                contains = True
-            #if we have not yet explored this state then
-            if contains == False:
-                #if it is not a winner then add it to the frontier
+        if nodeStateString not in explored: #********************
+            explored[nodeStateString] = True
+            successors = problem.getSuccessors(node.state)
+            #loop through the successors of this node
+            for successor in successors:
+                #declare state, action, and cost of this successor
+                state, action, cost = successor
+                #create a childNode of the popped node above
+                childNode = Node(state, node, action, cost)
+                #turn the state into a string to test if it is an exisiting key
                 frontier.push(childNode)
 """
     def depthFirstSearch(problem):
@@ -213,19 +203,15 @@ def breadthFirstSearch(problem):
             return None
         node = frontier.pop()
         if problem.isGoalState(node.state):
-            listOfDirections = getActionsForNode(childNode)
+            listOfDirections = getActionsForNode(node)
             return listOfDirections
         nodeStringState = str(node.state)
-        explored[nodeStringState] = True
-        successors = problem.getSuccessors(node.state)
-        for successor in successors:
-            state, action, cost = successor
-            childNode = Node(state, node, action, cost)
-            stringState = str(state)
-            contains = False
-            if stringState in explored:
-                contains = True
-            if contains == False:
+        if nodeStringState not in explored:
+            explored[nodeStringState] = True
+            successors = problem.getSuccessors(node.state)
+            for successor in successors:
+                state, action, cost = successor
+                childNode = Node(state, node, action, cost)
                 frontier.push(childNode)
 
 
@@ -233,15 +219,15 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     from util import PriorityQueue
+    from sets import Set
     success = False
     failure = False
     startState = problem.getStartState()
     startNode = Node(startState, None, None, 0)
     frontier = PriorityQueue()
     frontier.push(startNode, 0)
-    explored = {}
+    explored = Set([])
     listOfDirections = []
-
     while (success == False) and (failure == False):
         if frontier.isEmpty():
             print "Error: Frontier is empty"
@@ -252,18 +238,14 @@ def uniformCostSearch(problem):
             success = True
             listOfDirections = getActionsForNode(node)
             return listOfDirections
-        nodeStateString = str(node.state)
-        explored[nodeStateString] = True
-        successors = problem.getSuccessors(node.state)
-        for successor in successors:
-            state, action, cost = successor
-            childNode = Node(state, node, action, cost)
-            stateString = str(state)
-            containsState = False
-            if stateString in explored:
-                containsState = True
-            if containsState == False:
-                frontier.push(childNode, cost)
+        if node.state not in explored:
+            explored.add(node.state)
+            successors = problem.getSuccessors(node.state)
+            for successor in successors:
+                state, action, cost = successor
+                childPathCost = cost + node.cost
+                childNode = Node(state, node, action, childPathCost)
+                frontier.push(childNode, childPathCost)
 
 def nullHeuristic(state, problem=None):
     """
@@ -275,17 +257,17 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     from util import PriorityQueue
+    from sets import Set
 
     success = False
     failure = False
     startState = problem.getStartState()
 
     frontier = PriorityQueue()
-    explored = {}
+    explored = Set()
     initialPathCost = 0 + heuristic(startState, problem)
     initialNode = Node(startState, None, None, initialPathCost)
     frontier.push(initialNode,initialPathCost)
-
     listOfDirections = []
     while success == False and failure == False:
         if frontier.isEmpty():
@@ -297,20 +279,17 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             listOfDirections = getActionsForNode(node)
             success = True
             return listOfDirections
-        stateString = str(node.state)
-        explored[stateString] = True
-        successors = problem.getSuccessors(node.state)
-        for successor in successors:
-            state, action, cost = successor
-            childHeuristicCost = heuristic(state, problem)
-            childPathCost = cost + childHeuristicCost
-            child = Node(state, node, action, cost)
-            childStateString = str(state)
-            contains = False
-            if childStateString in explored:
-                contains = True
-            if contains == False:
-                frontier.push(child, childPathCost)
+        if node.state not in explored:
+            explored.add(node.state)
+            successors = problem.getSuccessors(node.state)
+            for successor in successors:
+                state, action, cost = successor
+                childHeuristicCost = heuristic(state, problem)
+                parentHeuristicCost = heuristic(node.state, problem)
+                childPathCost = cost + node.cost + childHeuristicCost - parentHeuristicCost
+                child = Node(state, node, action, childPathCost)
+                if state not in explored:
+                    frontier.push(child, childPathCost)
 
 
 
