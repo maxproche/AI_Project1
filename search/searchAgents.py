@@ -422,18 +422,20 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     position = state[0]
+    totalUnfound = 0
 
     for i in range(1,5):
         if state[i] == False:
             x, y = position
             c = problem.corners[0]
             cX, cY = c
-            totalDistance = ((x - cX)**2 + (y - cY)**2)**0.5
+            shortestDistance = ((x - cX)**2 + (y - cY)**2)**0.5
             break
         else:
-            totalDistance = 0
+            shortestDistance = 0
     for i in range(1,5):
         if state[i] == False:
+            totalUnfound = totalUnfound + 1
             corner = problem.corners[i - 1]
             cornerX, cornerY = corner
             dx = x - cornerX
@@ -441,10 +443,10 @@ def cornersHeuristic(state, problem):
             dxSquared = dx ** 2
             dySquared = dy ** 2
             distance = (dxSquared + dySquared) ** 0.5
-            if distance < totalDistance:
-                totalDistance = distance
+            if distance < shortestDistance:
+                shortestDistance = distance
 
-    return totalDistance
+    return shortestDistance*(0.2*totalUnfound)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -508,6 +510,20 @@ class AStarFoodSearchAgent(SearchAgent):
         self.searchFunction = lambda prob: search.aStarSearch(prob, foodHeuristic)
         self.searchType = FoodSearchProblem
 
+def euclidianDistance(position1, position2):
+    x1, y1 = position1
+    x2, y2 = position2
+
+    dx = x1 - x2
+    dy = y1 - y2
+
+    dxSquared = dx ** 2
+    dySquared = dy ** 2
+
+    distance = (dxSquared + dySquared) ** 0.5
+
+    return distance
+
 def foodHeuristic(state, problem):
     """
     Your heuristic for the FoodSearchProblem goes here.
@@ -537,8 +553,23 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    x, y = position
+    foodList = foodGrid.asList()
+    shortestDistance = None
+
+    for food in foodList:
+        foodx, foody = food
+        distance = abs(y - foody)
+        if shortestDistance == None:
+            shortestDistance = distance
+        if distance < shortestDistance:
+            shortestDistance = distance
+
+    if shortestDistance == None:
+        shortestDistance = 0
+
+    print shortestDistance
+    return shortestDistance
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
