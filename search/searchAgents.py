@@ -552,24 +552,54 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    w = problem.walls.asList()
     position, foodGrid = state
-    x, y = position
-    foodList = foodGrid.asList()
-    shortestDistance = None
+    food = foodGrid.asList()
+    totalDistance = 100000000000
+    i = 0
+    finalx = 0
+    finaly = 0
+    #finding the food's manhattan/Euclidean distances
+    for f in food:
+      x,y = position
+      fx, fy = f
+      dx = (x - fx)**2
+      dy = (y - fy)**2
+      distance = abs(x - fx) + abs(y - fy)
+      if distance < totalDistance:
+          totalDistance = distance
+          finalx2 = dx
+          finaly2 = dy
+          finalx = fx
+          finaly = fy
+          i = i + 1
+    #checking if there is a wall in our way
+    wallInWay = 0
+    for wall in w:
+      wx, wy = wall
+      x, y = position
+      if x<wx<finalx or x>wx>finalx:
+          wallInWay = wallInWay + 1
+      elif y<wy<finaly or y>wy>finaly:
+          wallInWay = wallInWay + 1
 
-    for food in foodList:
-        foodx, foody = food
-        distance = abs(y - foody)
-        if shortestDistance == None:
-            shortestDistance = distance
-        if distance < shortestDistance:
-            shortestDistance = distance
+    if i == 0:
+      totalDistance = 0
+      return totalDistance
+    else:
+      """if wallInWay == 13:
+          print
+          print foodGrid
+          print x,y
+          print problem.walls
+          print"""
+      foodWeight = 0.9
+      manWeight = .05
+      eucWeight = 0
+      wallWeight = 0.05
+      return  (foodWeight*len(food) + manWeight*totalDistance +
+              eucWeight*(finalx2+finaly2)**0.5 + wallWeight * wallInWay)
 
-    if shortestDistance == None:
-        shortestDistance = 0
-
-    print shortestDistance
-    return shortestDistance
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
