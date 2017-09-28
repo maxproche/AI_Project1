@@ -117,10 +117,8 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     #get the needed class
-    from game import Directions
-    from game import Actions
-    from pacman import GameState
     from util import Stack
+    from sets import Set
     #set up while loop variables
     success = False
     failure = False
@@ -135,7 +133,7 @@ def depthFirstSearch(problem):
     #put initial state in the frontier
     frontier.push(startNode)
     #initialize the explored dictionary
-    explored = {}  #*******************************************
+    explored = Set([])
     #make sure that we did not start at the goal
     if problem.isGoalState(startState):
         return listOfDirections
@@ -152,11 +150,11 @@ def depthFirstSearch(problem):
             success = True
             listOfDirections = getActionsForNode(node)
             return listOfDirections
-        #convert the state from state -> string so we can make it a dicitonary key
-        nodeStateString = str(node.state) #******** change this ***********************
         #get the successors of this popped node's state
-        if nodeStateString not in explored: #********************
-            explored[nodeStateString] = True
+        if node.state not in explored:
+            #add state to explored list
+            explored.add(node.state)
+            #expand state
             successors = problem.getSuccessors(node.state)
             #loop through the successors of this node
             for successor in successors:
@@ -187,6 +185,7 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     from util import Queue
+    from sets import Set
     success = False
     failure = False
     startState = problem.getStartState()
@@ -196,7 +195,7 @@ def breadthFirstSearch(problem):
         return listOfDirections
     frontier = Queue()
     frontier.push(startNode)
-    explored = {}
+    explored = Set([])
     while (success == False) and (failure == False):
         if frontier.isEmpty():
             print "Error: Frontier is empty"
@@ -205,9 +204,8 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(node.state):
             listOfDirections = getActionsForNode(node)
             return listOfDirections
-        nodeStringState = str(node.state)
-        if nodeStringState not in explored:
-            explored[nodeStringState] = True
+        if node.state not in explored:
+            explored.add(node.state)
             successors = problem.getSuccessors(node.state)
             for successor in successors:
                 state, action, cost = successor
